@@ -1,6 +1,11 @@
 name: Release
 
-on: workflow_dispatch # Manually kick off
+on:
+  workflow_dispatch: # Manually kick off
+    inputs:
+      version:
+        description: Optional version to bump to (defaults to incrementing patch)
+        required: false
 
 jobs:
   bump-version:
@@ -18,7 +23,8 @@ jobs:
       - name: Bump csproj version
         id: bump-version
         run: |
-          new_version=$(scripts/bump-csproj-version.sh throwaway-gh-action-test.csproj)
+          optional_version=${{ github.event.inputs.version }}
+          new_version=$(scripts/bump-csproj-version.sh throwaway-gh-action-test.csproj $optional_version)
           # Write the new version to the GitHub Actions output
           echo "new_version=$new_version" >> "$GITHUB_OUTPUT"
 
