@@ -4,7 +4,10 @@ on:
   workflow_dispatch: # Manually kick off
     inputs:
       version:
-        description: Optional version to bump to (defaults to incrementing patch)
+        description: >
+          Optionally provide a version to bump to in 'major.minor.patch' format
+          (e.g. 2.0.1). Otherwise, the patch version will be incremented
+          automatically.
         required: false
 
 jobs:
