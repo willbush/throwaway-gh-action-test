@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Takes a .csproj file as the first argument and an optional new version as the
+# second argument. When the second argument is not provided, the patch version
+# is incremented by 1. The script will update the version in the .csproj file
+# and print the new version.
 
 set -euo pipefail
 
