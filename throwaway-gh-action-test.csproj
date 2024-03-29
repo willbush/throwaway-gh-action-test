@@ -6,7 +6,7 @@
     <RootNamespace>throwaway_gh_action_test</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1</Version>
+    <Version>1.0.28</Version>
   </PropertyGroup>
 
 </Project>
