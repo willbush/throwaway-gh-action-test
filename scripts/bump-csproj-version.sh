@@ -7,7 +7,7 @@ csproj_path=$1
 
 # Checks if the file exists
 if [[ ! -f "$csproj_path" ]]; then
-  echo "File '$csproj_path' does not exist."
+  echo "File '$csproj_path' does not exist." >&2
   exit 1
 fi
 
@@ -18,7 +18,7 @@ version=$(grep -oPm1 "(?<=<Version>)[^<]+" "$csproj_path")
 IFS='.' read -r -a version_parts <<<"$version"
 
 if [[ ${#version_parts[@]} -ne 3 ]]; then
-  echo "Version '$version' is not in the correct format. Expected format is 'major.minor.patch'."
+  echo "Version '$version' is not in the correct format. Expected format is 'major.minor.patch'." >&2
   exit 1
 fi
 
