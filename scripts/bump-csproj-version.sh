@@ -2,34 +2,48 @@
 
 set -euo pipefail
 
-# Store path to csproj
-csproj_path=$1
+csproj_file=$1
 
-# Checks if the file exists
-if [[ ! -f "$csproj_path" ]]; then
-  echo "File '$csproj_path' does not exist." >&2
+# Check if the csproj file exists
+if [[ ! -f "$csproj_file" ]]; then
+  echo "File '$csproj_file' does not exist." >&2
   exit 1
 fi
 
-# Read version from csproj file and save into a variable
-version=$(grep -oPm1 "(?<=<Version>)[^<]+" "$csproj_path")
+# Read version from csproj file
+version=$(grep -oPm1 "(?<=<Version>)[^<]+" "$csproj_file")
 
-# Split the version into an array on the period '.'
-IFS='.' read -r -a version_parts <<<"$version"
+# Function to validate version format
+validate_version() {
+  local version=$1
+  local version_regex="^[0-9]+\.[0-9]+\.[0-9]+$"
 
-if [[ ${#version_parts[@]} -ne 3 ]]; then
-  echo "Version '$version' is not in the correct format. Expected format is 'major.minor.patch'." >&2
-  exit 1
+  if ! [[ $version =~ $version_regex ]]; then
+    echo "Version '$version' is not in the correct format. Expected format is 'major.minor.patch'." >&2
+    exit 1
+  fi
+}
+
+# Validate the current version format
+validate_version "$version"
+
+# Get new version from second argument or increment patch version
+if [[ -n "${2-}" ]]; then
+  # Validate the new version format
+  validate_version "$2"
+  new_version=$2
+else
+
+  # Split the version into an array
+  IFS='.' read -r -a version_parts <<<"$version"
+
+  # Increment the patch version
+  version_parts[2]=$((version_parts[2] + 1))
+
+  new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
 fi
-
-# Increment the last part of the version number
-((version_parts[2]++))
-
-# Recombine the version parts back into a full version string
-new_version="${version_parts[0]}.${version_parts[1]}.${version_parts[2]}"
 
 # Replace the old version with the new version in the .csproj file
-sed -i "s/<Version>$version/<Version>$new_version/g" "$csproj_path"
+sed -i "s/<Version>$version/<Version>$new_version/g" "$csproj_file"
 
-# echo the output as the new version because the GitHub action will use this as an output
 echo "$new_version"
