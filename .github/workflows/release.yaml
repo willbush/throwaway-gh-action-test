@@ -1,0 +1,29 @@
+name: Release
+
+on: workflow_dispatch # Manually kick off
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    outputs:
+      new_version: ${{ steps.bump-version.outputs.new_version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bump csproj version
+        id: bump-version
+        run: |
+          new_version=$(scripts/bump-csproj-version.sh throwaway-gh-action-test.csproj)
+          # Write the new version to the GitHub Actions output
+          echo "new_version=$new_version" >> "$GITHUB_OUTPUT"
+
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Bump version to ${{ steps.bump-version.outputs.new_version }}
+          tagging_message: tester-v${{ steps.bump-version.outputs.new_version }}
+          push_options: --tags
